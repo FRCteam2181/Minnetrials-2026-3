@@ -22,6 +22,7 @@ import frc.robot.commands.DriveCommand;
 // import frc.robot.commands.RollerSuckerCommand;
 import frc.robot.subsystems.CANDriveSubsystem;
 // import frc.robot.subsystems.CANRollerSubsystem;
+import frc.robot.subsystems.ChainSubsytem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -40,6 +41,8 @@ public class RobotContainer {
   // The driver's controller
   private final CommandXboxController driverController = new CommandXboxController(
       OperatorConstants.DRIVER_CONTROLLER_PORT);
+
+  private final ChainSubsytem chain = new ChainSubsytem();
 
   // The operator's controller
   private final Joystick operatorController = new Joystick(
