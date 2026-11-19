@@ -45,7 +45,7 @@ public class RobotContainer {
   private final ChainSubsytem chain = new ChainSubsytem();
 
   // The operator's controller
-  private final Joystick operatorController = new Joystick(
+  private final Joystick buttonBoard = new Joystick(
       OperatorConstants.OPERATOR_CONTROLLER_PORT);
       
 
@@ -57,6 +57,8 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Set up command bindings
+
+    pivotSubsystem.setDefaultCommand(chainSubsystem.run(Degrees.of(0.0)));
 
     configureBindings();
 
@@ -108,7 +110,7 @@ public class RobotContainer {
 
     // rollerintakebutton
     //     .whileTrue(new RollerSuckerCommand(() -> RollerConstants.SUCKER_ROLLER_EJECT_VALUE, () -> 0.0, rollerSubsystem));
-    JoystickButton chainButton = new JoystickButton(operatorController,1);
+    JoystickButton chainButton = new JoystickButton(buttonBoard,1);
     chainButton.whileTrue(chain.runMotor(1));
     //     JoystickButton rollerouttakebutton = new JoystickButton(operatorController, 3);        
     //     rollerouttakebutton
