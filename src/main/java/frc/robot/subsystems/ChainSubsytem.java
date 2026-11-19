@@ -1,7 +1,15 @@
 package frc.robot.subsystems;
 
+import java.io.ObjectInputFilter.Config;
+
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -21,39 +29,49 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 public class ChainSubsytem extends SubsystemBase {
     //Create new SparkFlex motorcontroller with the can ID of 5 and type of brushless
-    private  chain = new SparkFlex(5, MotorType.kBrushless);
+     SparkFlex chain = new SparkFlex(5, MotorType.kBrushless);
 
-    SparkMaxConfig config = new SparkMaxConfig();
+     SparkFlexConfig config = new SparkFlexConfig();
     //Brake Mode means motor will not move when idle
-    config.idleMode(IdleMode.kBrake);
-    config.smartCurrentLimit(60);
+
+    public ChainSubsytem(){
+        chain.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        config.idleMode(IdleMode.kBrake);
+        config.smartCurrentLimit(60);
+    }
+
+    
+    
+    
 
     //ResetSafeParameters -> Resets old settings Persisting -> Saves to correct memory
-    chain.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
 
     public void run(double dutyCycle) {
-        return chain.set(dutyCycle);
+        chain.set(dutyCycle);
     }
     public void stop(){
-        return chain.set(0);
+        chain.set(0);
     }
 
     public Command runMotor(double dutyCycle){
-        return chain.runEnd(() -> run(dutyCycle), 
-                           () -> stop());
+        return runEnd(() -> {run(dutyCycle);}, 
+                           () -> {stop();});
+    }
 
     /** Creates a new ExampleSubsystem. */
-    public ChainSubsystem() {}
+    // public ChainSubsystem() {}
     
     @Override
     public void periodic() {
     // This method will be called once per scheduler run
-    topIntakeWheel.updateTelemetry();
+    chain.updateTelemetry();
     }
     
     @Override
     public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
-    topIntakeWheel.simIterate();
+    ChainSubsytem.simIterate();
     }
-    }
+
+}
