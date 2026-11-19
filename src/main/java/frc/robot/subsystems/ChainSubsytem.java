@@ -29,38 +29,41 @@ import yams.motorcontrollers.local.SparkWrapper;
 
 public class ChainSubsytem extends SubsystemBase {
     //Create new SparkFlex motorcontroller with the can ID of 5 and type of brushless
-     SparkFlex chain = new SparkFlex(5, MotorType.kBrushless);
+     private final SparkFlex spark = new SparkFlex(5, MotorType.kBrushless);
 
-     SparkFlexConfig config = new SparkFlexConfig();
+
+    private final SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
+        .withControlMode(ControlMode.CLOSED_LOOP)
+        .withClosedLoopController(50.0, 0.0, 20.0)
+        .withSimClosedLoopController(50.0, 0.0, 20.0)
+        .withFeedforward(new SimpleMotorFeedforward(0.0, 0.0, 0.0))
+        .withSimFeedforward(new SimpleMotorFeedforward(0.0, 0.0, 0.0))
+        .withGearing(new MechanismGearing(8))
+        .withMomentOfInertia(Meters.of(1.0), Kilograms.of(3.0))
+        .withMotorInverted(false)
+        .withZeroPower(MotorMode.BRAKE)
+        .withStatorCurrentLimit(Amps.of(40))
+        .withStartingPosition(Degrees.of(0))
+        .withTelemetry("ChainSubsystemMotor", TelemetryVerbosity.HIGH);
+    
+
+    private final SmartMotorController motor = new SparkWrapper(spark, DCMotor.getNeoVortex(1), smcConfig);
+
+    private final PivotConfig pivotConfig = new PivotConfig()
+        .withHardLimits(Degrees.of(0.0), Degrees.of(90.0))
+        .withTekemetry("PivotSystem", TelemetryVerbosity.HIGH);
+
+    private final Pivot pivot = new Pivot(pivotConfig, motor);
     //Brake Mode means motor will not move when idle
 
-    public ChainSubsytem(){
-        chain.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        config.idleMode(IdleMode.kBrake);
-        config.smartCurrentLimit(60);
-    }
+    public Command set(double dutyCycle) {
+        return pivot.set(dutyCycle);
+  }
+    public Command run(Angle angle) {
+        return pivot.run(angle);
+  }
 
-    
-    
-    
 
-    //ResetSafeParameters -> Resets old settings Persisting -> Saves to correct memory
-    
-
-    public void run(double dutyCycle) {
-        chain.set(dutyCycle);
-    }
-    public void stop(){
-        chain.set(0);
-    }
-
-    public Command runMotor(double dutyCycle){
-        return runEnd(() -> {run(dutyCycle);}, 
-                           () -> {stop();});
-    }
-
-    /** Creates a new ExampleSubsystem. */
-    // public ChainSubsystem() {}
     
     @Override
     public void periodic() {
