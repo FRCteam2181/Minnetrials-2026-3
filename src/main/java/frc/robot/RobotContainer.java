@@ -47,6 +47,7 @@ public class RobotContainer {
   // The operator's controller
   private final Joystick operatorController = new Joystick(
       OperatorConstants.OPERATOR_CONTROLLER_PORT);
+      
 
   // The autonomous chooser
   private final SendableChooser<Command> autoChooser;
@@ -56,6 +57,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     // Set up command bindings
+
     configureBindings();
 
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -81,6 +83,7 @@ public class RobotContainer {
 
     // autoChooser.addOption("WorstCase", new DriveCommand(() -> 0.5, () -> 0, driveSubsystem).withTimeout(1));
     SmartDashboard.putData(autoChooser);
+
   }
 
   /**
@@ -100,12 +103,13 @@ public class RobotContainer {
   private void configureBindings() {
     // Set the A button to run the "RollerCommand" command with a fixed
     // value ejecting the gamepiece while the button is held
-
     // before
     // JoystickButton rollerintakebutton = new JoystickButton(operatorController, 1);
+
     // rollerintakebutton
     //     .whileTrue(new RollerSuckerCommand(() -> RollerConstants.SUCKER_ROLLER_EJECT_VALUE, () -> 0.0, rollerSubsystem));
-    
+    JoystickButton chainButton = new JoystickButton(operatorController,1);
+    chainButton.whileTrue(chain.runMotor(1));
     //     JoystickButton rollerouttakebutton = new JoystickButton(operatorController, 3);        
     //     rollerouttakebutton
     //     .whileTrue(new RollerSpitterCommand(() -> RollerConstants.SPITTER_ROLLER_TOP_EJECT_VALUE, () -> 0.0, () -> RollerConstants.SPITTER_ROLLER_EJECT_VALUE, () -> 0.0, rollerSubsystem));
