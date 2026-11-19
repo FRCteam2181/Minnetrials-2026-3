@@ -33,34 +33,44 @@ public class ChainSubsytem extends SubsystemBase {
 
 
     private final SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
-        .withControlMode(ControlMode.CLOSED_LOOP)
-        .withClosedLoopController(50.0, 0.0, 20.0)
-        .withSimClosedLoopController(50.0, 0.0, 20.0)
-        .withFeedforward(new SimpleMotorFeedforward(0.0, 0.0, 0.0))
-        .withSimFeedforward(new SimpleMotorFeedforward(0.0, 0.0, 0.0))
-        .withGearing(new MechanismGearing(8))
-        .withMomentOfInertia(Meters.of(1.0), Kilograms.of(3.0))
-        .withMotorInverted(false)
-        .withZeroPower(MotorMode.BRAKE)
-        .withStatorCurrentLimit(Amps.of(40))
-        .withStartingPosition(Degrees.of(0))
-        .withTelemetry("ChainSubsystemMotor", TelemetryVerbosity.HIGH);
+        .withClosedLoopController(4, 0, 0)
+    .withTrapezoidalProfile(DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
+      .withSoftLimits(Degrees.of(-30), Degrees.of(100))
+      .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 4)))
+//      .withExternalEncoder(armMotor.getAbsoluteEncoder())
+      .withZeroPower(MotorMode.BRAKE)
+      .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
+//      .withSpecificTelemetry("ArmMotor", motorTelemetryConfig)
+      .withStatorCurrentLimit(Amps.of(40))
+//      .withVoltageCompensation(Volts.of(12))
+      .withMotorInverted(false)
+      .withClosedLoopRampRate(Seconds.of(0.25))
+      .withOpenLoopRampRate(Seconds.of(0.25))
+      .withFeedforward(new ArmFeedforward(0, 0, 0, 0))
+      .withControlMode(ControlMode.CLOSED_LOOP)
+      .withExternalEncoder(cancoder)
+      .withExternalEncoderGearing(0.5)
+      .withUseExternalFeedbackEncoder(true)
+      .withStartingPosition(Degrees.of(0))
+      .withMomentOfInertia(Meters.of(0.135), Pounds.of(1));
+
     
 
     private final SmartMotorController motor = new SparkWrapper(spark, DCMotor.getNeoVortex(1), smcConfig);
 
-    private final PivotConfig pivotConfig = new PivotConfig()
+    private final ArmConfig armConfig = new ArmConfig()
         .withHardLimits(Degrees.of(0.0), Degrees.of(90.0))
-        .withTekemetry("PivotSystem", TelemetryVerbosity.HIGH);
+        .withLength(Feet.of(3))
+        .withTelemetry("PivotSystem", TelemetryVerbosity.HIGH);
 
-    private final Pivot pivot = new Pivot(pivotConfig, motor);
+    private final Arm arm = new Arm(armConfig, motor);
     //Brake Mode means motor will not move when idle
 
     public Command set(double dutyCycle) {
-        return pivot.set(dutyCycle);
+        return arm.set(dutyCycle);
   }
     public Command run(Angle angle) {
-        return pivot.run(angle);
+        return arm.run(angle);
   }
 
 
@@ -68,13 +78,13 @@ public class ChainSubsytem extends SubsystemBase {
     @Override
     public void periodic() {
     // This method will be called once per scheduler run
-    chain.updateTelemetry();
+    arm.updateTelemetry();
     }
     
     @Override
     public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
-    ChainSubsytem.simIterate();
+    arm.simIterate();
     }
 
 }
