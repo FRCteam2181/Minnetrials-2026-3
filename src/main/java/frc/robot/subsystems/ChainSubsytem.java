@@ -2,6 +2,13 @@ package frc.robot.subsystems;
 
 import java.io.ObjectInputFilter.Config;
 
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Seconds;
+import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.Pounds;
+
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
@@ -11,21 +18,27 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
+import yams.mechanisms.config.ArmConfig;
 import yams.mechanisms.config.FlyWheelConfig;
+import yams.mechanisms.positional.Arm;
 import yams.mechanisms.velocity.FlyWheel;
 import yams.motorcontrollers.SmartMotorController;
 import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
 import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.local.SparkWrapper;
+
 
 public class ChainSubsytem extends SubsystemBase {
     //Create new SparkFlex motorcontroller with the can ID of 5 and type of brushless
@@ -34,12 +47,12 @@ public class ChainSubsytem extends SubsystemBase {
 
     private final SmartMotorControllerConfig smcConfig = new SmartMotorControllerConfig(this)
         .withClosedLoopController(4, 0, 0)
-    .withTrapezoidalProfile(DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
+    //.withTrapezoidalProfile(DegreesPerSecond.of(180), DegreesPerSecondPerSecond.of(90))
       .withSoftLimits(Degrees.of(-30), Degrees.of(100))
       .withGearing(new MechanismGearing(GearBox.fromReductionStages(4, 4)))
 //      .withExternalEncoder(armMotor.getAbsoluteEncoder())
-      .withZeroPower(MotorMode.BRAKE)
-      .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
+      //.withZeroPower(MotorMode.BRAKE)
+      //.withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
 //      .withSpecificTelemetry("ArmMotor", motorTelemetryConfig)
       .withStatorCurrentLimit(Amps.of(40))
 //      .withVoltageCompensation(Volts.of(12))
@@ -48,7 +61,7 @@ public class ChainSubsytem extends SubsystemBase {
       .withOpenLoopRampRate(Seconds.of(0.25))
       .withFeedforward(new ArmFeedforward(0, 0, 0, 0))
       .withControlMode(ControlMode.CLOSED_LOOP)
-      .withExternalEncoder(cancoder)
+      //.withExternalEncoder(cancoder)
       .withExternalEncoderGearing(0.5)
       .withUseExternalFeedbackEncoder(true)
       .withStartingPosition(Degrees.of(0))

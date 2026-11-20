@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Joystick;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -58,7 +60,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Set up command bindings
 
-    pivotSubsystem.setDefaultCommand(chainSubsystem.run(Degrees.of(0.0)));
+    chain.setDefaultCommand(chain.run(Degrees.of(0.0)));
 
     configureBindings();
 
@@ -111,7 +113,7 @@ public class RobotContainer {
     // rollerintakebutton
     //     .whileTrue(new RollerSuckerCommand(() -> RollerConstants.SUCKER_ROLLER_EJECT_VALUE, () -> 0.0, rollerSubsystem));
     JoystickButton chainButton = new JoystickButton(buttonBoard,1);
-    chainButton.whileTrue(chain.runMotor(1));
+    chainButton.whileTrue(chain.set(1));
     //     JoystickButton rollerouttakebutton = new JoystickButton(operatorController, 3);        
     //     rollerouttakebutton
     //     .whileTrue(new RollerSpitterCommand(() -> RollerConstants.SPITTER_ROLLER_TOP_EJECT_VALUE, () -> 0.0, () -> RollerConstants.SPITTER_ROLLER_EJECT_VALUE, () -> 0.0, rollerSubsystem));
